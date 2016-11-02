@@ -81,7 +81,7 @@ class Main:
                         self.input_dirty = True
             if self.input_dirty: # Send the input to the Arduino if it's changed
                 package = str(self.turn) + ',' + str(self.speed) + 'a'
-                #self.serial.write(bytes(package, "utf-8"))
+                self.serial.write(bytes(package, "utf-8"))
             self.input_dirty = False
 
             # Below this is GUI stuff
