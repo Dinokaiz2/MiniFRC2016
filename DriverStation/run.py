@@ -103,8 +103,8 @@ class PIP(object):
 
 
 def main():
-    if not sys.version_info >= (3, 5):
-        print("Python 3.5+ is required. Your version is %s." % sys.version.split()[0])
+    if not sys.version_info[0] != 3:
+        print("Python 3 is required. Your version is %s." % sys.version.split()[0])
         print("Searching for Python 3.5")
 
         pycom = None
@@ -140,7 +140,7 @@ def main():
 
                 os.execlp(pycom, pycom, 'run.py')
 
-        print("Error: Use Python 3.5.")
+        print("Error: Use Python 3.")
         input("Press enter to continue.")
 
         return
