@@ -13,7 +13,7 @@ class Main:
                 if not 0 <= outgoing_bluetooth_port <= 256:
                     raise ValueError()
             except ValueError as v:
-                print("Invalid port! The COM port must be between 0 and 256. Type \"help\" for help.")
+                print("Invalid port! The COM port must be between 0 and 256.")
             else:
                 success = True
         try:
