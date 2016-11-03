@@ -38,8 +38,8 @@ void setup() {
 
 void loop() {
   while (bluetooth.available() > 0) { // Check if any data has been sent
-    turn = bluetooth.parseInt(); // Get the first integer from the data
-    velocity = bluetooth.parseInt(); // Get the second integer from the data
+    velocity = bluetooth.parseInt(); // Get the first integer from the data
+    turn = bluetooth.parseInt(); // Get the second integer from the data
 	
     // If you've edited the Driver Station to send extra data, you should
     // to do more calls to bluetooth.parseInt() here to get the data.
