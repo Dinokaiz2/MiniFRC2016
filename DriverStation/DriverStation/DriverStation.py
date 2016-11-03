@@ -2,6 +2,9 @@ import serial, time, pygame, sys, traceback
 
 from DriverStation.AAfilledRoundedRect import AAfilledRoundedRect as RoundedRect
 
+# How to create your own buttons:
+# First, go to line 40.
+
 class Main:
     def __init__(self):
         """This method runs as soon as the program starts."""
@@ -19,15 +22,13 @@ class Main:
         try:
             self.serial = serial.Serial("COM" + str(outgoing_bluetooth_port), 9600, timeout=None) # Access the COM port that sends data over Bluetooth
         except:
-            print("ERROR: The port couldn't be opened. Is the Arduino connected? Try unplugging and replugging it.")
+            print("ERROR: The port couldn't be opened. Is the Arduino connected? Try powering it off and on again.")
             input("Press enter/return to close the program.")
             sys.exit()
         else:
             print("Connected to robot!")
         pygame.init()
         self.clock = pygame.time.Clock() # Creates a timer to limit the framerate
-        self.speed = 0
-        self.turn = 0
         self.input_dirty = False # Is set to True only when the input changes so that we don't have to send stuff to the Arduino every frame.
         print("Driver Station started!")
         self.display = pygame.display.set_mode((200, 200))
@@ -35,6 +36,22 @@ class Main:
         self.font = pygame.font.SysFont("helvetica", 45)
         self.error_font = pygame.font.SysFont("helvetica", 24)
         self.window_focused = True
+
+        # Line 40: Here, you have to create a variable to hold the state of your button.
+        # For example, for an arm, you might make a variable called arm that you set to 1 when it's up, -1 when it's down and 0 when it's in the middle.
+        # This would look like: self.arm = 0
+        # Once you've done that, go to line 48.
+
+        self.speed = 0
+        self.turn = 0
+
+        # Line 48: Next, you're going to need to add it to the list of things to send to the Arduino.
+        # To do this, add your variable name as a string to the thingsToSend list.
+        # For example, if you wanted to add your arm variable to the list, it would look like:
+        # self.thingsToSend = ["self.speed", "self.turn", "self.arm"]
+        # Next, go to line 70.
+
+        self.thingsToSend = ["self.speed", "self.turn"]
         
     def start_loop(self):
         """This method runs over and over until the program ends."""
@@ -50,15 +67,26 @@ class Main:
                     elif event.state == 6:
                         self.window_focused = True
                         
-                # IF YOU'RE LOOKING TO ADD NEW BUTTONS, BELOW IS THE PLACE
+                # Line 70: Here, you're going to change the value of your variable when a key is pressed.
+                # Where it says "Add your keydown statement here", you need to add an elif statement checking if the key is pressed.
+                # If the key is pressed, you need to your variable's value to change and to change input_dirty so that the new
+                # value will be sent to the Arduino.
+                #
+                # For example, if you had a variable called arm that should be set to 1 when the "R" key is pressed, you would do:
+                # elif event.key == pygame.K_r:
+                #     self.arm = 1
+                #     self.input_dirty = True
+                #
+                # Next, go to line 102.
+                
                 
                 elif event.type == pygame.KEYDOWN: # Check if a key is pressed
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         sys.exit()
-                    elif event.key == pygame.K_UP or event.key == pygame.K_w: # If the key is the up arrow or W,
-                        self.speed = 1                                        # Change the speed to 1
-                        self.input_dirty = True                               # Tell the program that an input changed
+                    elif event.key == pygame.K_UP or event.key == pygame.K_w:   # If the key is the up arrow or W,
+                        self.speed = 1                                          # Change the speed to 1
+                        self.input_dirty = True                                 # Tell the program that an input changed
                     elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         self.speed = -1
                         self.input_dirty = True
@@ -68,19 +96,46 @@ class Main:
                     elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                         self.turn = -1
                         self.input_dirty = True
+                    # Add your keydown statement here
+
+
+                # Here, you need to make sure that the variable is also sent when the key is released.
+                # You'll only need to do this step if you want the variable to change back after the key is released.
+                # Where it says "Add your keyup statement here", you're going to add an elif statment that checks
+                # if the key was released. If it was, you'll change your variable.
+                #
+                # Example: if you have a variable called arm and want to change it back to 0 once the "R" key
+                # is released, you would do:
+                # elif event.key == pygame.K_r:
+                #     self.arm = 0
+                #     self.input_dirty = True
+                #
+                # That's it! Your variable will now be sent over bluetooth to the Arduino.
+                # Check the Robot.ino file in https://github.com/Dinokaiz2/MiniFRC2016/tree/master/Robot once
+                # you've finished this to figure out how to use the data you've sent.
                     
                 elif event.type == pygame.KEYUP:
                     if (((event.key == pygame.K_UP or event.key == pygame.K_w) and self.speed == 1) or
                        ((event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.speed == -1)):
                         self.speed = 0
                         self.input_dirty = True
-                    elif (((event.key ==  pygame.K_LEFT or event.key == pygame.K_a) and self.turn == 1) or
+                    elif (((event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.turn == 1) or
                          ((event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.turn == -1)):
                         self.turn = 0
                         self.input_dirty = True
+                    # Add your keyup statement here
+
+                
             if self.input_dirty: # Send the input to the Arduino if it's changed
-                package = str(self.turn) + ',' + str(self.speed) + 'a'
+                package = ""
+                for var in self.thingsToSend:
+                    var = eval(var)
+                    package += str(var) + ','
+                package = package[0:len(package)-1]
+                print(package)
+                package += 'a'
                 self.serial.write(bytes(package, "utf-8"))
+                
             self.input_dirty = False
 
             # Below this is GUI stuff
