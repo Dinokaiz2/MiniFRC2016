@@ -40,40 +40,50 @@ void loop() {
   while (bluetooth.available() > 0) { // Check if any data has been sent
     turn = bluetooth.parseInt(); // Get the first integer from the data
     velocity = bluetooth.parseInt(); // Get the second integer from the data
+	
+    // If you've edited the Driver Station to send extra data, you should
+    // to do more calls to bluetooth.parseInt() here to get the data.
+    // For example, if you have a number that you want to set the speed of
+    // a robot's arm to that you're sending from the Driver Station, you can
+    // get it here by doing:
+    // arm_speed = bluetooth.parseInt();
+    // You should declare the arm_speed variable where the turn and velocity
+    // variables are declared above the setup method.
+    	
     if (bluetooth.read() == 'a') { // Failsafe to ensure data isn't desynced
       if (velocity == 0 && turn == 0) { // Break
         driveRight(0);
         driveLeft(0);
       }
-      if (velocity == 1 && turn == 0) { // Forward
+      else if (velocity == 1 && turn == 0) { // Forward
         driveRight(255);
         driveLeft(255);
       }
-      if (velocity == -1 && turn == 0) { // Backward
+      else if (velocity == -1 && turn == 0) { // Backward
         driveRight(-255);
         driveLeft(-255);
       }
-      if (velocity == 0 && turn == 1) { // Rotate left on the spot
+      else if (velocity == 0 && turn == 1) { // Rotate left on the spot
         driveRight(255);
         driveLeft(-255);
       }
-      if (velocity == 0 && turn == -1) { // Rotate right on the sport
+      else if (velocity == 0 && turn == -1) { // Rotate right on the sport
         driveRight(-255);
         driveLeft(255);
       }
-      if (velocity == -1 && turn == -1) { // Arc back right
+      else if (velocity == -1 && turn == -1) { // Arc back right
         driveRight(-127);
         driveLeft(-255);
       }
-      if (velocity == -1 && turn == 1) { // Arc back left
+      else if (velocity == -1 && turn == 1) { // Arc back left
         driveRight(-255);
         driveLeft(-127);
       }
-      if (velocity == 1 && turn == -1) { // Arc forward right
+      else if (velocity == 1 && turn == -1) { // Arc forward right
         driveRight(127);
         driveLeft(255);
       }
-      if (velocity == 1 && turn == 1) { // Arc forward left
+      else if (velocity == 1 && turn == 1) { // Arc forward left
         driveRight(255);
         driveLeft(127);
       }
