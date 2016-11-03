@@ -1,7 +1,5 @@
 import serial, time, pygame, sys, traceback
 
-from DriverStation.AAfilledRoundedRect import AAfilledRoundedRect as RoundedRect
-
 class Main:
     def __init__(self):
         """This method runs as soon as the program starts."""
@@ -45,6 +43,7 @@ class Main:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.ACTIVEEVENT: # Detect if the window has lost focus
+                    print(event.state)
                     if event.state == 2:
                         self.window_focused = False
                     elif event.state == 6:
@@ -82,45 +81,6 @@ class Main:
                 package = str(self.turn) + ',' + str(self.speed) + 'a'
                 self.serial.write(bytes(package, "utf-8"))
             self.input_dirty = False
-
-            # Below this is GUI stuff
-            self.display.fill((0, 110, 0))
-            key_rect = pygame.Rect(10, 10, 180, 180)
-            RoundedRect(self.display, key_rect, (50, 50, 50))
-            dirs = []
-            if self.speed == 1:
-                dirs.append("Forward")
-            elif self.speed == -1:
-                dirs.append("Reverse")
-            if self.turn == 1:
-                dirs.append("Left")
-            elif self.turn == -1:
-                dirs.append("Right")
-            if len(dirs) == 1:
-                text = self.font.render(dirs[0], 1, (255, 255, 255))
-                text_pos = (100 - (text.get_width() * 0.5), 100 - (text.get_height() * 0.5))
-                self.display.blit(text, text_pos)
-            elif len(dirs) == 2:
-                top_text = self.font.render(dirs[0], 1, (255, 255, 255))
-                top_text_pos = (100 - (top_text.get_width() * 0.5), 105 - (top_text.get_height()))
-                bot_text = self.font.render(dirs[1], 1, (255, 255, 255))
-                bot_text_pos = (100 - (bot_text.get_width() * 0.5), 95)
-                self.display.blit(top_text, top_text_pos)
-                self.display.blit(bot_text, bot_text_pos)
-            if not self.window_focused:
-                black_overlay = pygame.Surface((200, 200))
-                black_overlay.set_alpha(128)
-                black_overlay.fill((0, 0, 0))
-                self.display.blit(black_overlay, (0, 0))
-                top_text = self.error_font.render("WINDOW", 1, (255, 0, 0))
-                mid_text = self.error_font.render("UNFOCUSED", 1, (255, 0, 0))
-                bot_text = self.error_font.render("Click to restore", 1, (255, 0, 0))
-                top_text_pos = (100 - top_text.get_width() * 0.5), 75 - (top_text.get_height())
-                mid_text_pos = (100 - mid_text.get_width() * 0.5), 105 - (mid_text.get_height())
-                bot_text_pos = (100 - bot_text.get_width() * 0.5), 150 - (bot_text.get_height())
-                self.display.blit(top_text, top_text_pos)
-                self.display.blit(mid_text, mid_text_pos)
-                self.display.blit(bot_text, bot_text_pos)
             pygame.display.flip()
             
 # This starts the program, probably don't need to touch anything below here.
